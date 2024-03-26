@@ -46,8 +46,8 @@ class ProvisionResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
                 Tables\Columns\TextColumn::make('amount'),
-                Tables\Columns\TextColumn::make('date'),
                 Tables\Columns\TextColumn::make('description'),
             ])
             ->filters([

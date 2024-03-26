@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MovementResource\Pages;
+use App\Models\Account;
 use App\Models\Movement;
 use App\Models\User;
 use Filament\Forms;
@@ -48,9 +49,9 @@ class MovementResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('date')->sortable(),
-                Tables\Columns\TextColumn::make('amount')->alignRight(),
-                Tables\Columns\TextColumn::make('description')->searchable(),
+                Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
+                Tables\Columns\TextColumn::make('amount')->money('eur')->alignRight(),
+                Tables\Columns\TextColumn::make('description')->wrap()->searchable(),
                 Tables\Columns\TextColumn::make('account.name'),
                 Tables\Columns\TextColumn::make('category.name'),
             ])
@@ -62,9 +63,7 @@ class MovementResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -80,8 +79,8 @@ class MovementResource extends Resource
     {
         /** @var User $user */
         $user = Auth::user();
+
         return parent::getEloquentQuery()
-            ->join('accounts', 'movements.account_id', '=', 'accounts.id')
-            ->where('accounts.user_id', '=', $user->id);
+            ->whereIn('account_id', Account::all()->where('user_id', '=', $user->id)->pluck('id'));
     }
 }
