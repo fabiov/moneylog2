@@ -8,6 +8,8 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListMovements extends ListRecords
 {
+    protected ?string $maxContentWidth = 'full';
+
     protected static string $resource = MovementResource::class;
 
     protected function getHeaderActions(): array

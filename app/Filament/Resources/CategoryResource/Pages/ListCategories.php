@@ -8,6 +8,8 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListCategories extends ListRecords
 {
+    protected ?string $maxContentWidth = 'full';
+
     protected static string $resource = CategoryResource::class;
 
     protected function getHeaderActions(): array
