@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MovementResource\Pages;
-use App\Filament\Resources\MovementResource\RelationManagers;
 use App\Models\Movement;
 use App\Models\User;
 use Filament\Forms;
@@ -12,7 +13,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class MovementResource extends Resource
@@ -48,23 +48,16 @@ class MovementResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('amount'),
-                Tables\Columns\TextColumn::make('date'),
-                Tables\Columns\TextColumn::make('description'),
+                Tables\Columns\TextColumn::make('date')->sortable(),
+                Tables\Columns\TextColumn::make('amount')->alignRight(),
+                Tables\Columns\TextColumn::make('description')->searchable(),
                 Tables\Columns\TextColumn::make('account.name'),
                 Tables\Columns\TextColumn::make('category.name'),
             ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->filters([])
+            ->actions([Tables\Actions\EditAction::make()])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
+            ->defaultSort('date', 'desc');
     }
 
     public static function getRelations(): array
