@@ -24,8 +24,6 @@ class AccountResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('user_id')
-                ->required(),
             Forms\Components\TextInput::make('name')
                 ->maxLength(255)
                 ->required(),
@@ -42,24 +40,14 @@ class AccountResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('status'),
             ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->filters([])
+            ->actions([Tables\Actions\EditAction::make()])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
