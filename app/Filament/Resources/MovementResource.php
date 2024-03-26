@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MovementResource\Pages;
 use App\Filament\Resources\MovementResource\RelationManagers;
 use App\Models\Movement;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class MovementResource extends Resource
 {
@@ -79,5 +81,14 @@ class MovementResource extends Resource
             'create' => Pages\CreateMovement::route('/create'),
             'edit' => Pages\EditMovement::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        return parent::getEloquentQuery()
+            ->join('accounts', 'movements.account_id', '=', 'accounts.id')
+            ->where('accounts.user_id', '=', $user->id);
     }
 }
