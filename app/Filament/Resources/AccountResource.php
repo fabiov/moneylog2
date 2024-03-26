@@ -28,7 +28,7 @@ class AccountResource extends Resource
                 ->maxLength(255)
                 ->required(),
             Forms\Components\Select::make('status')
-                ->options(['closes' => 'Closed', 'open' => 'Open', 'highlight' => 'Highlight'])
+                ->options(['closed' => 'Closed', 'open' => 'Open', 'highlight' => 'Highlight'])
                 ->required(),
         ]);
     }
@@ -38,7 +38,10 @@ class AccountResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('status')
+                    ->alignCenter()
+                    ->badge()
+                    ->colors(['primary' => 'open', 'success' => 'highlight', 'danger' => 'closed']),
             ])
             ->filters([])
             ->actions([Tables\Actions\EditAction::make()])
