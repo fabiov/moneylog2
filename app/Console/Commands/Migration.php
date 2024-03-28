@@ -59,7 +59,7 @@ class Migration extends Command
                 $row->id,
                 $row->name,
                 $row->email,
-                Hash::make('P@ssw0rd'),
+                '',
                 date('Y-m-d H:i:s'),
             ]);
 
