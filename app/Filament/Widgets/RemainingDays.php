@@ -30,8 +30,6 @@ class RemainingDays extends BaseWidget
         $setting = Setting::find(auth()->id());
         $today = (int) date('j');
 
-        return $today < $setting->payDay
-            ? $setting->getPayday() - $today
-            : intval(date('t')) - $today + $setting->payday;
+        return $today < $setting->payday ? $setting->payday - $today : intval(date('t')) - $today + $setting->payday;
     }
 }

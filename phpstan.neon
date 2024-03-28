@@ -1,0 +1,21 @@
+parameters:
+    checkGenericClassInNonGenericObjectType: false
+    level: 2
+    paths:
+        - app
+        - database
+        - routes
+        - tests
+    ignoreErrors:
+#        - '/^Access to an undefined property Laravel\\Nova\\Fields\\FormData::\$\w+\.$/'
+#        - '/^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany::pluck\(\)\.$/'
+#        - '/^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany::whereNotIn\(\)\.$/'
+#        - '/^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany::where\(\)\.$/'
+#        - '/^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany::where\(\)\.$/'
+#        - '/^Call to an undefined method Laravel\\Nova\\Fields\\Text::onlyOnExport\(\)\.$/'
+#        - '/^Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::\w+\(\)\.$/'
+#        - '/^Call to an undefined static method Illuminate\\Support\\Facades\\Http::sequence\(\)\.$/'
+#        - '/^Parameter #1 \$callback of method Illuminate\\Support\\Collection<\(int\|string\),mixed>::filter\(\) expects \(callable\(mixed, \(int\|string\)\): bool\)\|null, Closure\(Illuminate\\Database\\Eloquent\\Model\): bool given\.$/'
+#        - '/^Parameter #1 \$callback of method Illuminate\\Support\\Collection<\(int\|string\),mixed>::map\(\) expects callable\(mixed, \(int\|string\)\): array\{display: string, value: int\}, Closure\(App\\Models\\Location\): array\{display: string, value: int\} given\.$/'
+includes:
+    - phpstan-baseline.neon
