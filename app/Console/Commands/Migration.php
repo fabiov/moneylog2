@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Hash;
 
 class Migration extends Command
 {
@@ -58,7 +59,7 @@ class Migration extends Command
                 $row->id,
                 $row->name,
                 $row->email,
-                '',
+                Hash::make('P@ssw0rd'),
                 date('Y-m-d H:i:s'),
             ]);
 
