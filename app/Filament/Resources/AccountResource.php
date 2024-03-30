@@ -66,6 +66,7 @@ class AccountResource extends Resource
     {
         /** @var User $user */
         $user = Auth::user();
+
         return parent::getEloquentQuery()->where('user_id', '=', $user->id);
     }
 }

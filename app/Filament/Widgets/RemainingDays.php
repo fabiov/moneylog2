@@ -13,7 +13,7 @@ class RemainingDays extends BaseWidget
     {
         return [
             BaseWidget\Stat::make('Remaining to spend', '565,80 €')
-                ->chart([1,32,54,46])
+                ->chart([1, 32, 54, 46])
                 ->chartColor('success')
                 ->color('danger')
                 ->description('descrizione')

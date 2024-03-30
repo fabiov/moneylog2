@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProvisionResource\Pages;use App\Models\Provision;
+use App\Filament\Resources\ProvisionResource\Pages;
+use App\Models\Provision;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -76,6 +77,7 @@ class ProvisionResource extends Resource
     {
         /** @var User $user */
         $user = Auth::user();
+
         return parent::getEloquentQuery()->where('user_id', '=', $user->id);
     }
 }
