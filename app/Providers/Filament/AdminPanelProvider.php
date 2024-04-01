@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\RemainingDays;
+use App\Filament\Widgets\Budget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -40,9 +40,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-                RemainingDays::class,
+//                Widgets\AccountWidget::class,
+//                Widgets\FilamentInfoWidget::class,
+                Budget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
