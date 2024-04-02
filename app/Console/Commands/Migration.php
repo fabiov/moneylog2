@@ -34,10 +34,10 @@ class Migration extends Command
         $this->new->delete('DELETE FROM categories');
         $this->new->delete('DELETE FROM provisions');
         $this->new->delete('DELETE FROM settings');
-        $this->new->delete('DELETE FROM users');
+//        $this->new->delete('DELETE FROM users');
 
         // populate database
-        $this->info(sprintf('%d users imported', $this->usersMigration()));
+//        $this->info(sprintf('%d users imported', $this->usersMigration()));
         $this->info(sprintf('%d settings imported', $this->settingsMigration()));
         $this->info(sprintf('%d accounts imported', $this->accountsMigration()));
         $this->info(sprintf('%d categories imported', $this->categoriesMigration()));

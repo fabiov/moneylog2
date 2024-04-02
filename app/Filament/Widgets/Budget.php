@@ -7,6 +7,7 @@ namespace App\Filament\Widgets;
 use App\Models\Setting;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Number;
 
 class Budget extends BaseWidget
 {
@@ -14,20 +15,19 @@ class Budget extends BaseWidget
     {
         $remainingDays = $this->remainingDays();
         $remainingBudget = $this->remainingBudget();
+        $color = $remainingBudget ? 'success' : 'danger';
 
         return [
-            BaseWidget\Stat::make('Remaining to spend',number_format($remainingBudget, 2, ',', '.') . ' €')
-                ->color($remainingBudget ? 'success' : 'danger')
+            BaseWidget\Stat::make('Remaining to spend', Number::currency($remainingBudget, 'EUR', 'it'))
+                ->color($color)
                 ->description('Money left to spend in the month')
                 ->descriptionIcon('heroicon-o-currency-euro'),
-
             BaseWidget\Stat::make('Remaining to days', $remainingDays)
-                ->color($remainingBudget ? 'success' : 'danger')
+                ->color($color)
                 ->description('Days remaining before the next paycheck')
                 ->descriptionIcon('heroicon-o-calendar'),
-
-            BaseWidget\Stat::make('Daily budget', number_format($remainingBudget / $remainingDays, 2, ',', '.') .' €')
-                ->color($remainingBudget ? 'success' : 'danger')
+            BaseWidget\Stat::make('Daily budget', Number::currency($remainingBudget / $remainingDays, 'EUR', 'it'))
+                ->color($color)
                 ->description('Average daily budget')
                 ->descriptionIcon('heroicon-o-currency-euro'),
         ];
