@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class MonthlyOverviewChart extends ChartWidget
 {
+    protected int | string | array $columnSpan = 'full';
+
     protected static ?string $heading = 'Monthly overview';
 
-    protected int | string | array $columnSpan = 'full';
+    protected static ?string $pollingInterval = null;
 
     protected function getMaxHeight(): ?string
     {

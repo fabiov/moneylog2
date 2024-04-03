@@ -11,6 +11,8 @@ use Illuminate\Support\Number;
 
 class Budget extends BaseWidget
 {
+    protected static ?string $pollingInterval = null;
+
     protected function getStats(): array
     {
         $remainingDays = $this->remainingDays();
