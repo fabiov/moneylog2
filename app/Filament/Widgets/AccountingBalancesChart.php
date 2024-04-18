@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
@@ -13,7 +15,15 @@ class AccountingBalancesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $data = $this->getDataChart();
+        $data = DB::table('accounts')
+            ->select(['accounts.name', DB::raw('SUM(movements.amount) AS total')])
+            ->leftJoin('movements', 'accounts.id', '=', 'movements.account_id')
+            ->where('accounts.user_id', '=', 1)
+            ->where('accounts.status', '=', 'highlight')
+            ->groupBy('accounts.id')
+            ->orderBy('total', 'DESC')
+            ->get()
+            ->toArray();
 
         return [
             'labels' => array_map(fn ($item) => $item->name, $data),
@@ -34,18 +44,5 @@ class AccountingBalancesChart extends ChartWidget
     protected function getType(): string
     {
         return 'pie';
-    }
-
-    private function getDataChart(): array
-    {
-        return DB::table('accounts')
-            ->select(['accounts.name', DB::raw('SUM(movements.amount) AS total')])
-            ->leftJoin('movements', 'accounts.id', '=', 'movements.account_id')
-            ->where('accounts.user_id', '=', 1)
-            ->where('accounts.status', '=', 'highlight')
-            ->groupBy('accounts.id')
-            ->orderBy('total', 'DESC')
-            ->get()
-            ->toArray();
     }
 }
