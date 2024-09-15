@@ -6,8 +6,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MovementResource\Pages;
 use App\Models\Account;
+use App\Models\Category;
 use App\Models\Movement;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -34,14 +36,13 @@ class MovementResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('date')
-                    ->required()
-                    ->maxDate(now()),
+                    ->default(Carbon::now())
+                    ->required(),
                 Forms\Components\Select::make('account_id')
-                    ->relationship('account', 'name')
+                    ->options(Account::where('status', '<>', 'closed')->orderBy('name')->pluck('name', 'id'))
                     ->required(),
                 Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->required(),
+                    ->options(Category::where('active', true)->orderBy('name')->pluck('name', 'id')),
             ]);
     }
 
