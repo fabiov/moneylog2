@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MovementResource\Pages;
+use App\Filament\Resources\MovementResource\Widgets\MovementsStats;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Movement;
@@ -83,5 +84,12 @@ class MovementResource extends Resource
 
         return parent::getEloquentQuery()
             ->whereIn('account_id', Account::all()->where('user_id', '=', $user->id)->pluck('id'));
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            MovementsStats::class,
+        ];
     }
 }

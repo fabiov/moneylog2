@@ -12,6 +12,11 @@ class ListMovements extends ListRecords
 
     protected static string $resource = MovementResource::class;
 
+    protected function getHeaderWidgets(): array
+    {
+        return MovementResource::getWidgets();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
