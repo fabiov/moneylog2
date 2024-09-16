@@ -57,7 +57,11 @@ class MovementResource extends Resource
                 Tables\Columns\TextColumn::make('account.name'),
                 Tables\Columns\TextColumn::make('category.name'),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('account')
+                    ->relationship('account', 'name')
+                    ->multiple()
+            ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
             ->defaultSort('date', 'desc');
