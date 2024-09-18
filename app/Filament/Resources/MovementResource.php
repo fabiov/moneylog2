@@ -91,7 +91,7 @@ class MovementResource extends Resource
         $user = Auth::user();
 
         return parent::getEloquentQuery()
-            ->whereIn('account_id', Account::all()->where('user_id', '=', $user->id)->pluck('id'));
+            ->whereIn('account_id', Account::where('user_id', '=', $user->id)->pluck('id'));
     }
 
     public static function getWidgets(): array

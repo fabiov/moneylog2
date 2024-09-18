@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $provisioning
  * @property int $month
  * @property int $payday
+ * @property int $months
  */
 class Setting extends Model
 {
