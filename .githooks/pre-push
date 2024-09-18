@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+make sa < /dev/tty
+STATUS=$?
+
+if [[ "$STATUS" -eq 0 ]]; then
+    echo -e "\e[42mPHPStan successfully executed\e[m"
+else
+    echo -e "\e[31mPHPStan failed\e[m"
+    exit 1
+fi
+echo
+
+make ut < /dev/tty
+STATUS=$?
+
+if [[ "$STATUS" -eq 0 ]]; then
+    echo -e "\e[42mPHPUnit tests successfully executed\e[m"
+else
+    echo -e "\e[31mPHPUnit tests failed\e[m"
+    exit 1
+fi
+echo
