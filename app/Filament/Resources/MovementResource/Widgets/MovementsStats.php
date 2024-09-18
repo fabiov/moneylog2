@@ -26,10 +26,15 @@ class MovementsStats extends BaseWidget
     protected function getStats(): array
     {
         $widget = [];
+        /** @var Account $account */
         foreach (Account::where('status', '<>', 'closed')->get() as $account) {
             $balance = (float) Movement::where('account_id', $account->id)->sum('amount');
-            $widget[] = Stat::make($account->name, Number::currency($balance, 'EUR', 'it'));
+            $trend = Movement::getTrend($account->id);
+            $widget[] = Stat::make($account->name, Number::currency($balance, 'EUR', 'it'))
+                ->chart($trend)
+                ->chartColor(reset($trend) > end($trend) ? 'danger' : 'success');
         }
+
         return $widget;
     }
 }

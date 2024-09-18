@@ -12,15 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string $name
+ * @property int $id
  */
 #[ScopedBy([UserScope::class])]
 class Account extends Model
 {
     use HasFactory;
 
-    /**
-     * @return HasMany
-     */
     public function movements(): HasMany
     {
         return $this->hasMany(Movement::class);

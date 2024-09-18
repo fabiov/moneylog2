@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
  * @property float $amount
  * @property int $id
  * @property string $description
+ *
+ * @method static Builder where(string $column, string $value)
  */
 class Movement extends Model
 {
@@ -45,5 +48,18 @@ class Movement extends Model
             ->orderBy('account_count', 'DESC');
 
         return $qb->first()?->account_id;
+    }
+
+    public static function getTrend(int $accountId): array
+    {
+        $start = Carbon::now()->subMonth();
+        $stop = Carbon::now();
+
+        $data = [];
+        for ($d = $start; $d < $stop; $d->addDay()) {
+            $data[] = Movement::where('account_id', $accountId)->where('date', '<', $d)->sum('amount');
+        }
+
+        return $data;
     }
 }
