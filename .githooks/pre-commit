@@ -3,7 +3,7 @@
 FILES=$(git status --porcelain | grep "^[AM]  .\+\.php$"  | grep -v ".\+\.blade\.php" | cut -d ' ' -f 3)
 
 if [ "$FILES" ]; then
-    docker compose exec --user=sesame -T app vendor/bin/pint $FILES
+    docker compose exec --user=sail -T laravel.test vendor/bin/pint $FILES
 
     STATUS=$?
 

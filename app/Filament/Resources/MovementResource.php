@@ -56,7 +56,7 @@ class MovementResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
-                Tables\Columns\TextColumn::make('amount')->money('eur')->alignRight(),
+                Tables\Columns\TextColumn::make('amount')->sortable()->money('eur')->alignRight(),
                 Tables\Columns\TextColumn::make('description')->wrap()->searchable(),
                 Tables\Columns\TextColumn::make('account.name'),
                 Tables\Columns\TextColumn::make('category.name'),
@@ -64,7 +64,7 @@ class MovementResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('account')
                     ->relationship('account', 'name')
-                    ->multiple()
+                    ->multiple(),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
