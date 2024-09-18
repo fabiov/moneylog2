@@ -27,6 +27,9 @@ class MovementResource extends Resource
 
     public static function form(Form $form): Form
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make('amount')
@@ -41,6 +44,7 @@ class MovementResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('account_id')
                     ->options(Account::where('status', '<>', 'closed')->orderBy('name')->pluck('name', 'id'))
+                    ->default(Movement::mostUsedAccountId($user->id))
                     ->required(),
                 Forms\Components\Select::make('category_id')
                     ->options(Category::where('active', true)->orderBy('name')->pluck('name', 'id')),

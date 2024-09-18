@@ -18,6 +18,9 @@ class Account extends Model
 {
     use HasFactory;
 
+    /**
+     * @return HasMany
+     */
     public function movements(): HasMany
     {
         return $this->hasMany(Movement::class);

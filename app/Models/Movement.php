@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property ?Carbon $created_at
@@ -31,5 +32,18 @@ class Movement extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public static function mostUsedAccountId(int $userId): ?int
+    {
+        $qb = DB::table('movements')
+            ->select(DB::raw('COUNT(*) AS account_count, account_id'))
+            ->join('accounts', 'movements.account_id', '=', 'accounts.id')
+            ->where('user_id', $userId)
+            ->where('accounts.status', '<>', 'closed')
+            ->groupBy('account_id')
+            ->orderBy('account_count', 'DESC');
+
+        return $qb->first()?->account_id;
     }
 }
