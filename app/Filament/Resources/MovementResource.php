@@ -65,6 +65,34 @@ class MovementResource extends Resource
                 Tables\Filters\SelectFilter::make('account')
                     ->relationship('account', 'name')
                     ->multiple(),
+
+                Tables\Filters\Filter::make('amount')
+                    ->form([
+                        Forms\Components\TextInput::make('amount_from')->numeric()->step(0.01),
+                        Forms\Components\TextInput::make('amount_to')->numeric()->step(0.01),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['amount_from'] === '0' ? '0.0' : (float) $data['amount_from'],
+                                fn (Builder $query, $value): Builder => $query->where('amount', '>=', (float) $value),
+                            )
+                            ->when(
+                                $data['amount_to'] === '0' ? '0.0' : (float) $data['amount_to'],
+                                fn (Builder $query, $value): Builder => $query->where('amount', '<=', (float) $value),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if (($data['amount_from'] ?? '') !== '') {
+                            $indicators['amount_from'] = 'Amount from ' . $data['amount_from'];
+                        }
+                        if (($data['amount_to'] ?? '') !== '') {
+                            $indicators['amount_to'] = 'Amount to ' . $data['amount_to'];
+                        }
+
+                        return $indicators;
+                    }),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
