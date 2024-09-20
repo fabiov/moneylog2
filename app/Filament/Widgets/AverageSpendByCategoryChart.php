@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\Setting;
 use App\Models\User;
 use DateTime;
 use Filament\Widgets\ChartWidget;
@@ -21,8 +20,7 @@ class AverageSpendByCategoryChart extends ChartWidget
     {
         /** @var User $user */
         $user = auth()->user();
-        $setting = Setting::find($user->id);
-        $data = $this->getAverages($user->id, new DateTime(sprintf('-%d months', $setting->months)));
+        $data = $this->getAverages($user->id, new DateTime(sprintf('-%d months', $user->setting->months)));
 
         return [
             'labels' => array_map(fn ($item) => $item['name'], $data),

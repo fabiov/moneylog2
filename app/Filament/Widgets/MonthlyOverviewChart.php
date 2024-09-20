@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\Setting;
+use App\Models\User;
+use DateTime;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -24,16 +25,18 @@ class MonthlyOverviewChart extends ChartWidget
 
     protected function getData(): array
     {
-        $setting = Setting::find(auth()->id());
+        /** @var User $user */
+        $user = auth()->user();
+
         $currentDay = date('j');
 
-        if ($setting->payday) {
-            if ($currentDay < $setting->payday) {
-                $remainingDays = $setting->payday - $currentDay;
-                $begin = date("Y-m-$setting->payday", (int) strtotime('last month'));
+        if ($user->setting->payday) {
+            if ($currentDay < $user->setting->payday) {
+                $remainingDays = $user->setting->payday - $currentDay;
+                $begin = date("Y-m-{$user->setting->payday}", (int) strtotime('last month'));
             } else {
-                $remainingDays = intval(date('t')) - $currentDay + $setting->payday;
-                $begin = date("Y-m-$setting->payday");
+                $remainingDays = intval(date('t')) - $currentDay + $user->setting->payday;
+                $begin = date("Y-m-{$user->setting->payday}");
             }
             $end = date('Y-m-d', (int) strtotime(($remainingDays - 1) . ' day'));
         } else {
@@ -44,7 +47,7 @@ class MonthlyOverviewChart extends ChartWidget
         $dailyExpenses = $this->getDailyExpenses($begin, $end);
 
         return [
-            'labels' => array_map(fn ($item) => (new \DateTime($item->date))->format('d M'), $dailyExpenses),
+            'labels' => array_map(fn ($item) => (new DateTime($item->date))->format('d M'), $dailyExpenses),
             'datasets' => [
                 [
                     'label' => 'Daily expenses',
@@ -84,11 +87,11 @@ class MonthlyOverviewChart extends ChartWidget
             ->get()
             ->toArray();
 
-        $beginFiller = \DateTime::createFromFormat('Y-m-d', $begin);
-        $endFiller = \DateTime::createFromFormat('Y-m-d', $end);
+        $beginFiller = DateTime::createFromFormat('Y-m-d', $begin);
+        $endFiller = DateTime::createFromFormat('Y-m-d', $end);
 
         for ($i = $beginFiller; $i <= $endFiller; $i->modify('+1 day')) {
-            /** @var \DateTime $i */
+            /** @var DateTime $i */
             $day = $i->format('Y-m-d');
             if (! array_filter($dailyExpenses, fn ($item) => $item->date === $day)) {
                 $objectDay = new stdClass();
