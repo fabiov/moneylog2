@@ -7,10 +7,11 @@ namespace App\Filament\Widgets;
 use App\Models\Setting;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class MonthlyOverviewChart extends ChartWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = 'Monthly overview';
 
@@ -65,6 +66,9 @@ class MonthlyOverviewChart extends ChartWidget
         return 'bar';
     }
 
+    /**
+     * @return array<stdClass>
+     */
     public function getDailyExpenses(string $begin, string $end): array
     {
         $dailyExpenses = DB::table('movements')
@@ -81,20 +85,20 @@ class MonthlyOverviewChart extends ChartWidget
             ->toArray();
 
         $beginFiller = \DateTime::createFromFormat('Y-m-d', $begin);
-        $endFiller   = \DateTime::createFromFormat('Y-m-d', $end);
+        $endFiller = \DateTime::createFromFormat('Y-m-d', $end);
 
         for ($i = $beginFiller; $i <= $endFiller; $i->modify('+1 day')) {
             /** @var \DateTime $i */
             $day = $i->format('Y-m-d');
-            if (!array_filter($dailyExpenses, fn ($item) => $item->date === $day)) {
-                $objectDay = new \stdClass();
+            if (! array_filter($dailyExpenses, fn ($item) => $item->date === $day)) {
+                $objectDay = new stdClass();
                 $objectDay->date = $day;
                 $objectDay->amount = 0;
                 $dailyExpenses[] = $objectDay;
             }
         }
 
-        usort($dailyExpenses, fn($a, $b) => $a->date <=> $b->date);
+        usort($dailyExpenses, fn ($a, $b) => $a->date <=> $b->date);
 
         return $dailyExpenses;
     }

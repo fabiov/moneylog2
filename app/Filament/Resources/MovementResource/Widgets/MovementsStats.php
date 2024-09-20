@@ -31,7 +31,7 @@ class MovementsStats extends BaseWidget
             $balance = (float) Movement::where('account_id', $account->id)->sum('amount');
             $trend = Movement::getTrend($account->id);
             $widget[] = Stat::make($account->name, Number::currency($balance, 'EUR', 'it'))
-                ->chart($trend)
+                ->chart(array_map(fn (float $value): int => (int) $value, $trend))
                 ->chartColor(reset($trend) > end($trend) ? 'danger' : 'success');
         }
 

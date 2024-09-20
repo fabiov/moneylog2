@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\DB;
  * @property int $id
  * @property string $description
  *
- * @method static Builder where(string $column, string $value)
+ * @method static Builder where(string $column, mixed $operator)
  */
 class Movement extends Model
 {
@@ -50,6 +50,9 @@ class Movement extends Model
         return $qb->first()?->account_id;
     }
 
+    /**
+     * @return array<float>
+     */
     public static function getTrend(int $accountId): array
     {
         $start = Carbon::now()->subMonth();

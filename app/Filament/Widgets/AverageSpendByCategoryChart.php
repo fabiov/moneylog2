@@ -7,6 +7,7 @@ namespace App\Filament\Widgets;
 use App\Models\Setting;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class AverageSpendByCategoryChart extends ChartWidget
 {
@@ -36,8 +37,8 @@ class AverageSpendByCategoryChart extends ChartWidget
                         'rgb(255, 099, 132)',
                         'rgb(255, 205, 086)',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -46,6 +47,9 @@ class AverageSpendByCategoryChart extends ChartWidget
         return 'pie';
     }
 
+    /**
+     * @return array<array{average: float, name: string, id: int, active: bool}>
+     */
     private function getAverages(int $userId, \DateTime $since): array
     {
         $qb = DB::table('categories')
@@ -92,6 +96,9 @@ class AverageSpendByCategoryChart extends ChartWidget
         return $data;
     }
 
+    /**
+     * @return array<stdClass>
+     */
     private function oldestMovements(int $userId): array
     {
         $qb = DB::table('categories')
