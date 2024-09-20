@@ -39,29 +39,18 @@ class ProvisionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->actions([Tables\Actions\EditAction::make()])
             ->columns([
                 Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
                 Tables\Columns\TextColumn::make('amount'),
                 Tables\Columns\TextColumn::make('description'),
             ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ])
+            ->defaultPaginationPageOption(25);
     }
 
     public static function getPages(): array

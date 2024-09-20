@@ -54,6 +54,7 @@ class MovementResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->actions([Tables\Actions\EditAction::make()])
             ->columns([
                 Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
                 Tables\Columns\TextColumn::make('amount')->sortable()->money('eur')->alignRight(),
@@ -94,8 +95,8 @@ class MovementResource extends Resource
                         return $indicators;
                     }),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
+            ->defaultPaginationPageOption(25)
             ->defaultSort('date', 'desc');
     }
 

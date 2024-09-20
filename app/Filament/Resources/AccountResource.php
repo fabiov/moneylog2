@@ -36,6 +36,7 @@ class AccountResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->actions([Tables\Actions\EditAction::make()])
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('status')
@@ -44,8 +45,8 @@ class AccountResource extends Resource
                     ->colors(['primary' => 'open', 'success' => 'highlight', 'danger' => 'closed']),
             ])
             ->filters([])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
+            ->defaultPaginationPageOption(25);
     }
 
     public static function getRelations(): array
