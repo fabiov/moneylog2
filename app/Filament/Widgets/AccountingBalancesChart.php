@@ -26,18 +26,18 @@ class AccountingBalancesChart extends ChartWidget
             ->toArray();
 
         return [
-            'labels' => array_map(fn ($item) => $item->name, $data),
+            'labels' => array_map(fn ($item): string => $item instanceof \stdClass ? $item->name : '', $data),
             'datasets' => [
                 [
                     'label' => 'My First Dataset',
-                    'data' => array_map(fn ($item) => $item->total, $data),
+                    'data' => array_map(fn ($item) => $item instanceof \stdClass ? $item->total : 0, $data),
                     'backgroundColor' => [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',
                         'rgb(255, 205, 86)',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

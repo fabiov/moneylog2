@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Helpers\Type;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Illuminate\Support\Facades\DB;
@@ -51,25 +52,25 @@ class Budget extends BaseWidget
         /** @var User $user */
         $user = auth()->user();
 
-        $accountTotal = (float) DB::table('movements')
+        $accountTotal = Type::float(DB::table('movements')
             ->join('accounts', 'movements.account_id', '=', 'accounts.id')
             ->where('accounts.user_id', '=', $user->id)
             ->where('accounts.status', '<>', 'closed')
-            ->sum('movements.amount');
+            ->sum('movements.amount'));
 
         if (! $user->setting->provisioning) {
             return $accountTotal;
         }
 
-        $provisionTotal = (float) DB::table('provisions')
+        $provisionTotal = Type::float(DB::table('provisions')
             ->where('user_id', '=', $user->id)
-            ->sum('amount');
+            ->sum('amount'));
 
-        $categorizedTotal = (float) DB::table('movements')
+        $categorizedTotal = Type::float(DB::table('movements')
             ->join('accounts', 'movements.account_id', '=', 'accounts.id')
             ->where('accounts.user_id', '=', $user->id)
             ->whereNotNull('movements.category_id')
-            ->sum('movements.amount');
+            ->sum('movements.amount'));
 
         return $accountTotal - $provisionTotal - $categorizedTotal;
     }

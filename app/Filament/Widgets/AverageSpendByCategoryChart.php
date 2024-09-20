@@ -72,7 +72,8 @@ class AverageSpendByCategoryChart extends ChartWidget
         foreach ($oldestMovements as $oldestMovement) {
             $average = null;
 
-            $item = $rs->first(fn ($i) => $i->category_id === $oldestMovement->category_id);
+            /** @var ?stdClass $item */
+            $item = $rs->first(fn ($i) => $i instanceof stdClass && $i->category_id === $oldestMovement->category_id);
 
             if ($item) {
                 $date = $oldestMovement->date < $item->first_date ? $since->format('Y-m-d') : $item->first_date;
@@ -113,6 +114,7 @@ class AverageSpendByCategoryChart extends ChartWidget
             ->where('categories.active', '=', 1)
             ->groupBy('categories.id');
 
+        /** @var array<stdClass> */
         return $qb->get()->toArray();
     }
 }

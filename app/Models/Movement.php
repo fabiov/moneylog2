@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Helpers\Type;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -64,7 +65,7 @@ class Movement extends Model
 
         $data = [];
         for ($d = $start; $d < $stop; $d->addDay()) {
-            $data[] = Movement::where('account_id', $accountId)->where('date', '<', $d)->sum('amount');
+            $data[] = Type::float(Movement::where('account_id', $accountId)->where('date', '<', $d)->sum('amount'));
         }
 
         return $data;
