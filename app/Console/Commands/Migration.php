@@ -34,10 +34,8 @@ class Migration extends Command
         $this->new->delete('DELETE FROM categories');
         $this->new->delete('DELETE FROM provisions');
         $this->new->delete('DELETE FROM settings');
-//        $this->new->delete('DELETE FROM users');
 
         // populate database
-//        $this->info(sprintf('%d users imported', $this->usersMigration()));
         $this->info(sprintf('%d settings imported', $this->settingsMigration()));
         $this->info(sprintf('%d accounts imported', $this->accountsMigration()));
         $this->info(sprintf('%d categories imported', $this->categoriesMigration()));
@@ -45,27 +43,6 @@ class Migration extends Command
         $this->info(sprintf('%d provisions imported', $this->provisionsMigration()));
 
         return 0;
-    }
-
-    private function usersMigration(): int
-    {
-        $i = 0;
-        $select = 'SELECT * FROM user WHERE id IN (1, 21)';
-        $insert = 'INSERT INTO users (id, name, email, password, created_at) VALUES (?, ?, ?, ?, ?)';
-
-        foreach ($this->old->select($select) as $row) {
-            $this->new->insert($insert, [
-                $row->id,
-                $row->name,
-                $row->email,
-                '',
-                date('Y-m-d H:i:s'),
-            ]);
-
-            $i++;
-        }
-
-        return $i;
     }
 
     private function settingsMigration(): int
