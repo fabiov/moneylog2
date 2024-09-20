@@ -31,6 +31,7 @@ class ProvisionResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('date')
+                    ->default(now())
                     ->required()
                     ->maxDate(now()),
             ]);
