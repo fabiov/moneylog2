@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Setting;
+use App\Models\User;
+use DateTime;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -17,10 +19,10 @@ class AverageSpendByCategoryChart extends ChartWidget
 
     protected function getData(): array
     {
-        $userId = auth()->id();
-        $setting = Setting::find($userId);
-
-        $data = $this->getAverages($userId, new \DateTime(sprintf('-%d months', $setting->months)));
+        /** @var User $user */
+        $user = auth()->user();
+        $setting = Setting::find($user->id);
+        $data = $this->getAverages($user->id, new DateTime(sprintf('-%d months', $setting->months)));
 
         return [
             'labels' => array_map(fn ($item) => $item['name'], $data),
@@ -48,9 +50,9 @@ class AverageSpendByCategoryChart extends ChartWidget
     }
 
     /**
-     * @return array<array{average: float, name: string, id: int, active: bool}>
+     * @return array<array{average: ?float, name: string, id: int, active: bool}>
      */
-    private function getAverages(int $userId, \DateTime $since): array
+    private function getAverages(int $userId, DateTime $since): array
     {
         $qb = DB::table('categories')
             ->select([

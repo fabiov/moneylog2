@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 /**
  * @property ?Carbon $created_at
@@ -47,7 +48,10 @@ class Movement extends Model
             ->groupBy('account_id')
             ->orderBy('account_count', 'DESC');
 
-        return $qb->first()?->account_id;
+        /** @var ?stdClass $model */
+        $model = $qb->first();
+
+        return $model?->account_id;
     }
 
     /**
