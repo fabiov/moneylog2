@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\AccountingBalancesChart;
+use App\Filament\Widgets\AverageSpendByCategoryChart;
 use App\Filament\Widgets\Budget;
 use App\Filament\Widgets\MonthlyOverviewChart;
 use Filament\Http\Middleware\Authenticate;
@@ -38,12 +40,11 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-//                Widgets\AccountWidget::class,
-//                Widgets\FilamentInfoWidget::class,
                 Budget::class,
                 MonthlyOverviewChart::class,
+                AccountingBalancesChart::class,
+                AverageSpendByCategoryChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
