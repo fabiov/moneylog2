@@ -94,6 +94,36 @@ class MovementResource extends Resource
 
                         return $indicators;
                     }),
+
+                Tables\Filters\Filter::make('date')
+                    ->form([
+                        Forms\Components\DatePicker::make('date_from')
+                            ->placeholder(fn ($state): string => now()->subYear()->format('d/m/Y')),
+                        Forms\Components\DatePicker::make('date_until')
+                            ->placeholder(fn ($state): string => now()->format('d/m/Y')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['date_from'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
+                            )
+                            ->when(
+                                $data['date_until'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['date_from'] ?? null) {
+                            $indicators['date_from'] = 'Date from ' . Carbon::parse($data['date_from'])->format('d/m/Y');
+                        }
+                        if ($data['date_until'] ?? null) {
+                            $indicators['date_until'] = 'Date until ' . Carbon::parse($data['date_until'])->format('d/m/Y');
+                        }
+
+                        return $indicators;
+                    }),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
             ->defaultPaginationPageOption(25)
@@ -119,8 +149,7 @@ class MovementResource extends Resource
         /** @var User $user */
         $user = Auth::user();
 
-        return parent::getEloquentQuery()
-            ->whereIn('account_id', Account::where('user_id', '=', $user->id)->pluck('id'));
+        return parent::getEloquentQuery()->whereIn('account_id', Account::where('user_id', $user->id)->pluck('id'));
     }
 
     public static function getWidgets(): array
