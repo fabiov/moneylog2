@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Helpers\Type;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Number;
 
 class Budget extends BaseWidget
@@ -16,8 +14,11 @@ class Budget extends BaseWidget
 
     protected function getStats(): array
     {
+        /** @var User $user */
+        $user = auth()->user();
+
         $remainingDays = $this->remainingDays();
-        $remainingBudget = $this->remainingBudget();
+        $remainingBudget = $user->remainingBudget();
         $color = $remainingBudget ? 'success' : 'danger';
 
         return [
@@ -45,33 +46,5 @@ class Budget extends BaseWidget
         return $today < $user->setting->payday
             ? $user->setting->payday - $today
             : intval(date('t')) - $today + $user->setting->payday;
-    }
-
-    private function remainingBudget(): float
-    {
-        /** @var User $user */
-        $user = auth()->user();
-
-        $accountTotal = Type::float(DB::table('movements')
-            ->join('accounts', 'movements.account_id', '=', 'accounts.id')
-            ->where('accounts.user_id', '=', $user->id)
-            ->where('accounts.status', '<>', 'closed')
-            ->sum('movements.amount'));
-
-        if (! $user->setting->provisioning) {
-            return $accountTotal;
-        }
-
-        $provisionTotal = Type::float(DB::table('provisions')
-            ->where('user_id', '=', $user->id)
-            ->sum('amount'));
-
-        $categorizedTotal = Type::float(DB::table('movements')
-            ->join('accounts', 'movements.account_id', '=', 'accounts.id')
-            ->where('accounts.user_id', '=', $user->id)
-            ->whereNotNull('movements.category_id')
-            ->sum('movements.amount'));
-
-        return $accountTotal - $provisionTotal - $categorizedTotal;
     }
 }

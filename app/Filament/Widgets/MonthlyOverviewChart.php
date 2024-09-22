@@ -45,6 +45,7 @@ class MonthlyOverviewChart extends ChartWidget
         }
 
         $dailyExpenses = $this->getDailyExpenses($begin, $end);
+        $budgetProjections = $this->getBudgetProjections($begin, $end);
 
         return [
             'labels' => array_map(fn ($item) => (new DateTime($item->date))->format('d M'), $dailyExpenses),
@@ -60,6 +61,17 @@ class MonthlyOverviewChart extends ChartWidget
                     ],
                     'borderWidth' => 1,
                 ],
+                [
+                    'label' => 'Budget projection',
+                    'data' => $budgetProjections,
+                    'backgroundColor' => [
+                        'rgba(0, 128, 0, 0.2)',
+                    ],
+                    'borderColor' => [
+                        'rgb(0, 128, 0)',
+                    ],
+                    'borderWidth' => 1,
+                ],
             ],
         ];
     }
@@ -71,6 +83,8 @@ class MonthlyOverviewChart extends ChartWidget
 
     /**
      * @return array<stdClass>
+     *
+     * @throws \DateMalformedStringException
      */
     public function getDailyExpenses(string $begin, string $end): array
     {
@@ -104,5 +118,31 @@ class MonthlyOverviewChart extends ChartWidget
         usort($dailyExpenses, fn ($a, $b) => $a->date <=> $b->date);
 
         return $dailyExpenses;
+    }
+
+    /**
+     * @return array<int>
+     *
+     * @throws \DateMalformedStringException
+     */
+    private function getBudgetProjections(string $begin, string $end): array
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        /** @var DateTime $beginFiller */
+        $beginFiller = DateTime::createFromFormat('Y-m-d', $begin);
+
+        /** @var DateTime $endFiller */
+        $endFiller = DateTime::createFromFormat('Y-m-d', $end);
+
+        $data = [];
+        $today = now();
+        $remaining = $user->remainingBudget();
+        for ($i = $beginFiller; $i <= $endFiller; $i->modify('+1 day')) {
+            $data[] = $i < $today ? 0 : (int) ($remaining / ($i->diff($endFiller)->days + 1));
+        }
+
+        return $data;
     }
 }
