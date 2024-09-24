@@ -59,13 +59,18 @@ class User extends Authenticatable implements FilamentUser
         return true;
     }
 
-    public function remainingBudget(): float
+    public function accountsBalance(): float
     {
-        $accountTotal = Type::float(DB::table('movements')
+        return Type::float(DB::table('movements')
             ->join('accounts', 'movements.account_id', '=', 'accounts.id')
             ->where('accounts.user_id', $this->id)
             ->where('accounts.status', '<>', 'closed')
             ->sum('movements.amount'));
+    }
+
+    public function remainingBudget(): float
+    {
+        $accountTotal = $this->accountsBalance();
 
         if (! $this->setting->provisioning) {
             return $accountTotal;
