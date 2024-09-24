@@ -18,11 +18,21 @@ class Balances extends BaseWidget
         $user = auth()->user();
 
         $accountsBalance = $user->accountsBalance();
+        $provisionBalance = $user->provisionBalance();
+        $averageExpensesPerCategory = abs(array_sum(array_column($user->averageExpensesPerCategory(), 'average')));
 
         return [
             BaseWidget\Stat::make('Total balance of all accounts', Number::currency($accountsBalance, 'EUR', 'it'))
                 ->color($accountsBalance > 0 ? 'success' : 'danger')
                 ->description('Money left to spend in the month')
+                ->descriptionIcon('heroicon-o-currency-euro'),
+            BaseWidget\Stat::make('Provision balance', Number::currency($provisionBalance, 'EUR', 'it'))
+                ->color($provisionBalance > 0 ? 'success' : 'danger')
+                ->description('Provision balance')
+                ->descriptionIcon('heroicon-o-currency-euro'),
+            BaseWidget\Stat::make('Expenses', Number::currency($averageExpensesPerCategory, 'EUR', 'it'))
+                ->color($provisionBalance > 0 ? 'success' : 'danger')
+                ->description('Total average monthly expenses')
                 ->descriptionIcon('heroicon-o-currency-euro'),
         ];
     }
