@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\AccountingBalancesChart;
 use App\Filament\Widgets\AverageSpendByCategoryChart;
+use App\Filament\Widgets\Balances;
 use App\Filament\Widgets\Budget;
 use App\Filament\Widgets\MonthlyOverviewChart;
 use Filament\Http\Middleware\Authenticate;
@@ -43,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Budget::class,
                 MonthlyOverviewChart::class,
+                Balances::class,
                 AccountingBalancesChart::class,
                 AverageSpendByCategoryChart::class,
             ])
