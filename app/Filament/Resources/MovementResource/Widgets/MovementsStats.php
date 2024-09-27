@@ -13,6 +13,7 @@ use DateInterval;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
 
 class MovementsStats extends BaseWidget
@@ -28,11 +29,11 @@ class MovementsStats extends BaseWidget
 
     protected function getStats(): array
     {
-        $startDate = empty($this->tableFilters['date']['date_from'])
-            ? Carbon::now()->subYear() : Carbon::parse($this->tableFilters['date']['date_from']);
+        $fromFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_from'));
+        $startDate = empty($fromFilterValue) ? Carbon::now()->subYear() : Carbon::parse($fromFilterValue);
 
-        $endDate = empty($this->tableFilters['date']['date_until'])
-            ? Carbon::now() : Carbon::parse($this->tableFilters['date']['date_until']);
+        $untilFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_until'));
+        $endDate = empty($fromFilterValue) ? Carbon::now() : Carbon::parse($untilFilterValue);
 
         if ($startDate->diffInYears($endDate) > 2) {
             $interval = DateInterval::createFromDateString('1 year');
