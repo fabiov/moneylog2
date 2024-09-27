@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\User;
+use DateMalformedStringException;
 use DateTime;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,9 @@ class MonthlyOverviewChart extends ChartWidget
         return '200px';
     }
 
+    /**
+     * @throws DateMalformedStringException
+     */
     protected function getData(): array
     {
         /** @var User $user */
@@ -45,34 +49,38 @@ class MonthlyOverviewChart extends ChartWidget
         }
 
         $dailyExpenses = $this->getDailyExpenses($begin, $end);
-        $budgetProjections = $this->getBudgetProjections($begin, $end);
+
+        $dataset = [
+            [
+                'label' => 'Daily expenses',
+                'data' => array_map(fn ($item) => abs((float) $item->amount), $dailyExpenses),
+                'backgroundColor' => [
+                    'rgba(255, 0, 0, 0.2)',
+                ],
+                'borderColor' => [
+                    'rgb(255, 0, 0)',
+                ],
+                'borderWidth' => 1,
+            ],
+        ];
+
+        if ($user->setting->provisioning) {
+            $dataset[] = [
+                'label' => 'Budget projection',
+                'data' => $this->getBudgetProjections($begin, $end),
+                'backgroundColor' => [
+                    'rgba(0, 128, 0, 0.2)',
+                ],
+                'borderColor' => [
+                    'rgb(0, 128, 0)',
+                ],
+                'borderWidth' => 1,
+            ];
+        }
 
         return [
             'labels' => array_map(fn ($item) => (new DateTime($item->date))->format('d M'), $dailyExpenses),
-            'datasets' => [
-                [
-                    'label' => 'Daily expenses',
-                    'data' => array_map(fn ($item) => abs((float) $item->amount), $dailyExpenses),
-                    'backgroundColor' => [
-                        'rgba(255, 0, 0, 0.2)',
-                    ],
-                    'borderColor' => [
-                        'rgb(255, 0, 0)',
-                    ],
-                    'borderWidth' => 1,
-                ],
-                [
-                    'label' => 'Budget projection',
-                    'data' => $budgetProjections,
-                    'backgroundColor' => [
-                        'rgba(0, 128, 0, 0.2)',
-                    ],
-                    'borderColor' => [
-                        'rgb(0, 128, 0)',
-                    ],
-                    'borderWidth' => 1,
-                ],
-            ],
+            'datasets' => $dataset,
         ];
     }
 
@@ -84,7 +92,7 @@ class MonthlyOverviewChart extends ChartWidget
     /**
      * @return array<stdClass>
      *
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     public function getDailyExpenses(string $begin, string $end): array
     {
@@ -123,7 +131,7 @@ class MonthlyOverviewChart extends ChartWidget
     /**
      * @return array<int>
      *
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     private function getBudgetProjections(string $begin, string $end): array
     {

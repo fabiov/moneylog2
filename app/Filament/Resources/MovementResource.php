@@ -67,6 +67,10 @@ class MovementResource extends Resource
                     ->relationship('account', 'name')
                     ->multiple(),
 
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('category', 'name')
+                    ->multiple(),
+
                 Tables\Filters\Filter::make('amount')
                     ->form([
                         Forms\Components\TextInput::make('amount_from')->numeric()->step(0.01),

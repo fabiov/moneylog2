@@ -8,9 +8,12 @@ use App\Filament\Resources\MovementResource\Pages\ListMovements;
 use App\Helpers\Type;
 use App\Models\Account;
 use App\Models\Movement;
+use Carbon\Carbon;
+use DateInterval;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
 
 class MovementsStats extends BaseWidget
@@ -26,16 +29,32 @@ class MovementsStats extends BaseWidget
 
     protected function getStats(): array
     {
-        $widget = [];
+        $fromFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_from'));
+        $startDate = empty($fromFilterValue) ? Carbon::now()->subYear() : Carbon::parse($fromFilterValue);
+
+        $untilFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_until'));
+        $endDate = empty($fromFilterValue) ? Carbon::now() : Carbon::parse($untilFilterValue);
+
+        if ($startDate->diffInYears($endDate) > 2) {
+            $interval = DateInterval::createFromDateString('1 year');
+        } elseif ($startDate->diffInMonths($endDate) > 2) {
+            $interval = DateInterval::createFromDateString('1 months');
+        } else {
+            $interval = DateInterval::createFromDateString('1 day');
+        }
+
+        $widgets = [];
         /** @var Account $account */
         foreach (Account::where('status', '<>', 'closed')->get() as $account) {
             $balance = Type::float(Movement::where('account_id', $account->id)->sum('amount'));
-            $trend = Movement::getTrend($account->id);
-            $widget[] = Stat::make($account->name, Number::currency($balance, 'EUR', 'it'))
+
+            $trend = Movement::getTrend($account->id, $startDate, $endDate, $interval);
+
+            $widgets[] = Stat::make($account->name, Number::currency($balance, 'EUR', 'it'))
                 ->chart(array_map(fn (float $value): int => (int) $value, $trend))
                 ->chartColor(reset($trend) > end($trend) ? 'danger' : 'success');
         }
 
-        return $widget;
+        return $widgets;
     }
 }
