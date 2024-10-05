@@ -34,7 +34,7 @@ class CategoryResource extends Resource
             ->actions([Tables\Actions\EditAction::make()])
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('active'),
+                Tables\Columns\IconColumn::make('active')->boolean(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\User;
+use DateMalformedStringException;
 use Filament\Widgets\ChartWidget;
 
 class AverageSpendByCategoryChart extends ChartWidget
@@ -13,11 +14,17 @@ class AverageSpendByCategoryChart extends ChartWidget
 
     protected static ?string $pollingInterval = null;
 
+    /**
+     * @throws DateMalformedStringException
+     */
     protected function getData(): array
     {
         /** @var User $user */
         $user = auth()->user();
-        $data = $user->averageExpensesPerCategory();
+        $data = array_values(array_filter(
+            $user->averageExpensesPerCategory(),
+            fn (array $category): bool => (bool) $category['average']
+        ));
 
         return [
             'labels' => array_map(fn ($item) => $item['name'], $data),
