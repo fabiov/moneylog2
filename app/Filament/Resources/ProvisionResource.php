@@ -46,14 +46,15 @@ class ProvisionResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
                 Tables\Columns\TextColumn::make('amount'),
-                Tables\Columns\TextColumn::make('description'),
+                Tables\Columns\TextColumn::make('description')->wrap(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultPaginationPageOption(25);
+            ->defaultPaginationPageOption(25)
+            ->defaultSort('date', 'desc');
     }
 
     public static function getPages(): array
