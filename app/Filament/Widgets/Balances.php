@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Models\Category;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Illuminate\Support\Number;
@@ -26,7 +27,13 @@ class Balances extends BaseWidget
         $user = auth()->user();
 
         $accountsBalance = $user->accountsBalance();
-        $averageExpensesPerCategory = abs(array_sum(array_column($user->averageExpensesPerCategory(), 'average')));
+
+        $averageExpensesPerCategory = 0;
+        /** @var Category $category */
+        foreach ($user->categories as $category) {
+            $averageExpensesPerCategory += $category->average($user->setting->months);
+        }
+        $averageExpensesPerCategory = abs($averageExpensesPerCategory);
 
         $widgets = [
             BaseWidget\Stat::make('Total balance of all accounts', Number::currency($accountsBalance, 'EUR', 'it'))

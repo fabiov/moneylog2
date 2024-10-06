@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Helpers\Type;
-use DateTime;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
-use stdClass;
 
 /**
- * @property int $id
+ * @property Collection<Category> $categories
  * @property Setting $setting
+ * @property int $id
  */
 class User extends Authenticatable implements FilamentUser
 {
@@ -56,6 +57,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(Setting::class, 'id');
     }
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
@@ -92,67 +98,5 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return $accountTotal - $this->provisionBalance();
-    }
-
-    /**
-     * @return array<array{average: float, name: string}>
-     *
-     * @throws \DateMalformedStringException
-     */
-    public function averageExpensesPerCategory(): array
-    {
-        $since = new DateTime(sprintf('-%d months', $this->setting->months));
-
-        $oldestMovements = DB::table('categories')
-            ->select([
-                'categories.id AS category_id',
-                'categories.name',
-                DB::raw('MIN(movements.date) AS date'),
-                'categories.active',
-            ])
-            ->leftJoin('movements', 'categories.id', '=', 'movements.category_id')
-            ->where('categories.user_id', '=', $this->id)
-            ->where('categories.active', '=', 1)
-            ->groupBy('categories.id')
-            ->get();
-
-        $rs = DB::table('categories')
-            ->select([
-                'categories.id AS category_id',
-                DB::raw('SUM(movements.amount) AS amount'),
-                DB::raw('MIN(movements.date) AS first_date'),
-            ])
-            ->join('movements', 'categories.id', '=', 'movements.category_id')
-            ->where('categories.user_id', '=', $this->id)
-            ->where('categories.active', '=', 1)
-            ->where('movements.date', '>=', $since->format('Y-m-d'))
-            ->groupBy('categories.id')
-            ->get();
-
-        $data = [];
-        /** @var stdClass $oldestMovement */
-        foreach ($oldestMovements as $oldestMovement) {
-
-            $average = 0;
-
-            /** @var ?stdClass $item */
-            $item = $rs->first(fn ($i) => $i instanceof stdClass && $i->category_id === $oldestMovement->category_id);
-
-            if ($item) {
-                $date = $oldestMovement->date < $item->first_date ? $since->format('Y-m-d') : $item->first_date;
-                [$y, $m, $d] = explode('-', $date);
-
-                // month difference
-                $firstDateUnixTime = mktime(0, 0, 0, (int) $m, (int) $d, (int) $y);
-                $monthDiff = (mktime(0, 0, 0) - $firstDateUnixTime) / 2628000;
-                if ($monthDiff) {
-                    $average = $item->amount / $monthDiff;
-                }
-            }
-
-            $data[] = ['average' => $average, 'name' => $oldestMovement->name];
-        }
-
-        return $data;
     }
 }

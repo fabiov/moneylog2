@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
@@ -12,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Number;
 
 class CategoryResource extends Resource
 {
@@ -30,11 +33,19 @@ class CategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         return $table
             ->actions([Tables\Actions\EditAction::make()])
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\IconColumn::make('active')->boolean(),
+                Tables\Columns\TextColumn::make('average')
+                    ->alignRight()
+                    ->state(function (Category $category) use ($user): string {
+                        return Number::currency($category->average($user->setting->months), 'EUR', 'IT');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
