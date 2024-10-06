@@ -44,7 +44,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('average')
                     ->alignRight()
                     ->state(function (Category $category) use ($user): string {
-                        return Number::currency($category->average($user->setting->months), 'EUR', 'IT');
+                        return (string) Number::currency($category->average($user->setting->months), 'EUR', 'IT');
                     }),
             ])
             ->bulkActions([

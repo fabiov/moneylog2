@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Helpers\Type;
 use App\Models\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,7 +39,7 @@ class Category extends Model
     public function average(int $months): float
     {
         $fromDate = Carbon::now()->subMonths($months);
-        $firstMovementDate = Carbon::parse(Movement::where('category_id', $this->id)->min('date'));
+        $firstMovementDate = Carbon::parse(Type::string(Movement::where('category_id', $this->id)->min('date')));
 
         if ($firstMovementDate > $fromDate) {
             $fromDate = $firstMovementDate;

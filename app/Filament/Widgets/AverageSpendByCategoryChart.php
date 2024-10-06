@@ -7,6 +7,7 @@ namespace App\Filament\Widgets;
 use App\Models\Category;
 use App\Models\User;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Database\Eloquent\Model;
 
 class AverageSpendByCategoryChart extends ChartWidget
 {
@@ -19,11 +20,14 @@ class AverageSpendByCategoryChart extends ChartWidget
         /** @var User $user */
         $user = auth()->user();
         $data = array_values(array_filter($user->categories
-            ->map(fn (Category $category): array => [
-                'average' => $category->average($user->setting->months),
-                'name' => $category->name,
-            ])
-            ->toArray(), fn (array $category): bool => (bool) $category['average']));
+            ->map(function (Model $category) use ($user): array {
+                /** @var Category $category */
+                return [
+                    'average' => $category->average($user->setting->months),
+                    'name' => $category->name,
+                ];
+            })
+            ->toArray(), fn ($category): bool => is_array($category) && $category['average']));
 
         return [
             'labels' => array_map(fn ($item) => $item['name'], $data),

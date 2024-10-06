@@ -20,13 +20,15 @@ class Type
 
     public static function nullableString(mixed $value): ?string
     {
-        if (is_null($value)) {
-            return null;
-        }
-        if (is_scalar($value) || $value instanceof Stringable) {
+        return is_null($value) ? null : self::string($value);
+    }
+
+    public static function string(mixed $value): string
+    {
+        if (is_null($value) || is_scalar($value) || $value instanceof Stringable) {
             return (string) $value;
         }
 
-        throw new InvalidArgumentException('Can\'t cast to nullable string');
+        throw new InvalidArgumentException('Can\'t cast to string');
     }
 }
