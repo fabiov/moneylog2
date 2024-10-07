@@ -45,7 +45,7 @@ class ProvisionResource extends Resource
             ->actions([Tables\Actions\EditAction::make()])
             ->columns([
                 Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
-                Tables\Columns\TextColumn::make('amount'),
+                Tables\Columns\TextColumn::make('amount')->money('eur')->alignRight(),
                 Tables\Columns\TextColumn::make('description')->wrap(),
             ])
             ->bulkActions([
