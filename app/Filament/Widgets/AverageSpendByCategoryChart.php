@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AverageSpendByCategoryChart extends ChartWidget
 {
-    protected static ?string $heading = 'Chart';
+    protected static ?string $heading = 'Average monthly spending by category';
 
     protected static ?string $pollingInterval = null;
 
@@ -28,6 +28,8 @@ class AverageSpendByCategoryChart extends ChartWidget
                 ];
             })
             ->toArray(), fn ($category): bool => is_array($category) && $category['average']));
+
+        usort($data, fn ($a, $b) => $a['average'] <=> $b['average']);
 
         return [
             'labels' => array_map(fn ($item) => $item['name'], $data),
