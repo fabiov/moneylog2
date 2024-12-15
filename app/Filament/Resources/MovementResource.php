@@ -64,12 +64,10 @@ class MovementResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('account')
-                    ->relationship('account', 'name')
-                    ->multiple(),
+                    ->relationship('account', 'name'),
 
                 Tables\Filters\SelectFilter::make('category')
-                    ->relationship('category', 'name')
-                    ->multiple(),
+                    ->relationship('category', 'name'),
 
                 Tables\Filters\Filter::make('amount')
                     ->form([
