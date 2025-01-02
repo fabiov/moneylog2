@@ -58,45 +58,11 @@ class MovementResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('date')->date('d/m/Y')->sortable()->width(105),
                 Tables\Columns\TextColumn::make('amount')->sortable()->money('eur')->alignRight(),
-                Tables\Columns\TextColumn::make('description')->wrap()->searchable(),
+                Tables\Columns\TextColumn::make('description')->wrap(),
                 Tables\Columns\TextColumn::make('account.name'),
                 Tables\Columns\TextColumn::make('category.name'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('account')
-                    ->relationship('account', 'name'),
-
-                Tables\Filters\SelectFilter::make('category')
-                    ->relationship('category', 'name'),
-
-                Tables\Filters\Filter::make('amount')
-                    ->form([
-                        Forms\Components\TextInput::make('amount_from')->numeric()->step(0.01),
-                        Forms\Components\TextInput::make('amount_to')->numeric()->step(0.01),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['amount_from'] === '0' ? '0.0' : (float) $data['amount_from'],
-                                fn (Builder $query, $value): Builder => $query->where('amount', '>=', (float) $value),
-                            )
-                            ->when(
-                                $data['amount_to'] === '0' ? '0.0' : (float) $data['amount_to'],
-                                fn (Builder $query, $value): Builder => $query->where('amount', '<=', (float) $value),
-                            );
-                    })
-                    ->indicateUsing(function (array $data): array {
-                        $indicators = [];
-                        if (($data['amount_from'] ?? '') !== '') {
-                            $indicators['amount_from'] = 'Amount from ' . $data['amount_from'];
-                        }
-                        if (($data['amount_to'] ?? '') !== '') {
-                            $indicators['amount_to'] = 'Amount to ' . $data['amount_to'];
-                        }
-
-                        return $indicators;
-                    }),
-
                 Tables\Filters\Filter::make('date')
                     ->form([
                         Forms\Components\DatePicker::make('date_from')
@@ -118,18 +84,73 @@ class MovementResource extends Resource
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators['date_from'] = 'Date from ' . Carbon::parse($data['date_from'])->format('d/m/Y');
+                            $indicators['date_from'] = 'Date from: ' . Carbon::parse($data['date_from'])->format('d/m/Y');
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators['date_until'] = 'Date until ' . Carbon::parse($data['date_until'])->format('d/m/Y');
+                            $indicators['date_until'] = 'Date until: ' . Carbon::parse($data['date_until'])->format('d/m/Y');
                         }
 
                         return $indicators;
                     }),
-            ])
+
+                Tables\Filters\Filter::make('amount')
+                    ->form([
+                        Forms\Components\TextInput::make('amount_from')->numeric()->step(0.01),
+                        Forms\Components\TextInput::make('amount_to')->numeric()->step(0.01),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['amount_from'] === '0' ? '0.0' : (float) $data['amount_from'],
+                                fn (Builder $query, $value): Builder => $query->where('amount', '>=', (float) $value),
+                            )
+                            ->when(
+                                $data['amount_to'] === '0' ? '0.0' : (float) $data['amount_to'],
+                                fn (Builder $query, $value): Builder => $query->where('amount', '<=', (float) $value),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if (($data['amount_from'] ?? '') !== '') {
+                            $indicators['amount_from'] = 'Amount from: ' . $data['amount_from'];
+                        }
+                        if (($data['amount_to'] ?? '') !== '') {
+                            $indicators['amount_to'] = 'Amount to: ' . $data['amount_to'];
+                        }
+
+                        return $indicators;
+                    }),
+
+                Tables\Filters\Filter::make('description')
+                    ->form([
+                        Forms\Components\TextInput::make('description'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['description'] ?? null,
+                                fn (Builder $query, $value): Builder => $query->where('description', 'LIKE', "%$value%"),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if (($data['description'] ?? '') !== '') {
+                            $indicators['description'] = 'Description: ' . $data['description'];
+                        }
+
+                        return $indicators;
+                    }),
+
+                Tables\Filters\SelectFilter::make('account')
+                    ->relationship('account', 'name'),
+
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('category', 'name'),
+            ], Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
             ->defaultPaginationPageOption(25)
-            ->defaultSort('date', 'desc');
+            ->defaultSort('date', 'DESC')
+            ->persistFiltersInSession();
     }
 
     public static function getRelations(): array
