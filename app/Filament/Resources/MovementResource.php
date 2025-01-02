@@ -149,7 +149,8 @@ class MovementResource extends Resource
             ], Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
             ->defaultPaginationPageOption(25)
-            ->defaultSort('date', 'desc');
+            ->defaultSort('date', 'DESC')
+            ->persistFiltersInSession();
     }
 
     public static function getRelations(): array
