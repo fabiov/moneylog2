@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AverageSpendByCategoryChart extends ChartWidget
 {
-    protected static ?string $heading = 'Chart';
+    protected static ?string $heading = 'Average monthly spending by category';
 
     protected static ?string $pollingInterval = null;
 
@@ -29,6 +29,8 @@ class AverageSpendByCategoryChart extends ChartWidget
             })
             ->toArray(), fn ($category): bool => is_array($category) && $category['average']));
 
+        usort($data, fn ($a, $b) => $a['average'] <=> $b['average']);
+
         return [
             'labels' => array_map(fn ($item) => $item['name'], $data),
             'datasets' => [
@@ -36,13 +38,13 @@ class AverageSpendByCategoryChart extends ChartWidget
                     'label' => 'My First Dataset',
                     'data' => array_map(fn ($item) => $item['average'], $data),
                     'backgroundColor' => [
-                        'rgb(054, 162, 235)',
-                        'rgb(110, 086, 108)',
-                        'rgb(149, 109, 148)',
-                        'rgb(195, 172, 170)',
-                        'rgb(247, 207, 190)',
-                        'rgb(255, 099, 132)',
-                        'rgb(255, 205, 086)',
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(54, 162, 235)',
+                        'rgb(153, 102, 255)',
+                        'rgb(201, 203, 207)',
                     ],
                 ],
             ],
