@@ -63,6 +63,9 @@ class AccountResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<Account>
+     */
     public static function getEloquentQuery(): Builder
     {
         /** @var User $user */
