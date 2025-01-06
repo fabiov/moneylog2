@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 class UserScope implements Scope
 {
+    /**
+     * @param  Builder<User>  $builder
+     */
     public function apply(Builder $builder, Model $model): void
     {
         /** @var User $user */
