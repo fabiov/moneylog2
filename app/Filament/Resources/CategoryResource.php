@@ -64,6 +64,9 @@ class CategoryResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<Category>
+     */
     public static function getEloquentQuery(): Builder
     {
         /** @var User $user */
