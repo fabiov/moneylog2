@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Filament\Pages\Auth\EditProfile;
 use App\Helpers\Type;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -65,6 +66,16 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            ->login()
+            ->registration()
+            ->passwordReset()
+            ->emailVerification()
+            ->profile(EditProfile::class);
     }
 
     public function accountsBalance(): float
