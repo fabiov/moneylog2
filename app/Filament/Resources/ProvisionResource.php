@@ -66,6 +66,9 @@ class ProvisionResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<Provision>
+     */
     public static function getEloquentQuery(): Builder
     {
         /** @var User $user */

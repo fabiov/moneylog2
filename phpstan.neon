@@ -1,13 +1,9 @@
 includes:
-    - phpstan-baseline.neon
     - vendor/larastan/larastan/extension.neon
 parameters:
-    checkGenericClassInNonGenericObjectType: false
     level: 9
     paths:
         - app
         - database
         - routes
         - tests
-    ignoreErrors:
-#        - '/^Access to an undefined property Laravel\\Nova\\Fields\\FormData::\$\w+\.$/'

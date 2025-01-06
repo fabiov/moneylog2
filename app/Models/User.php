@@ -8,7 +8,6 @@ use App\Helpers\Type;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,26 +15,20 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
 /**
- * @property Collection<Category> $categories
+ * @property Collection<int, Category> $categories
  * @property Setting $setting
  * @property int $id
  */
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable;
+    use Notifiable;
 
-    /**
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -52,11 +45,17 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
+    /**
+     * @return HasOne<Setting, $this>
+     */
     public function setting(): HasOne
     {
         return $this->hasOne(Setting::class, 'id');
     }
 
+    /**
+     * @return HasMany<Category, $this>
+     */
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);
