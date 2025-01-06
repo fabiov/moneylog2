@@ -167,11 +167,15 @@ class MovementResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<Movement>
+     */
     public static function getEloquentQuery(): Builder
     {
         /** @var User $user */
         $user = Auth::user();
 
+        /** @var Builder<Movement> */
         return parent::getEloquentQuery()->whereIn('account_id', Account::where('user_id', $user->id)->pluck('id'));
     }
 
