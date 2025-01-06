@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Models\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -17,8 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ScopedBy([UserScope::class])]
 class Account extends Model
 {
-    use HasFactory;
-
+    /**
+     * @return HasMany<Movement, $this>
+     */
     public function movements(): HasMany
     {
         return $this->hasMany(Movement::class);
