@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string $name
+ * @property string $status
  * @property int $id
  */
 #[ScopedBy([UserScope::class])]

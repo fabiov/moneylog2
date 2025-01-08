@@ -142,7 +142,23 @@ class MovementResource extends Resource
                     }),
 
                 Tables\Filters\SelectFilter::make('account')
-                    ->relationship('account', 'name'),
+                    ->options(function (): array {
+                        $options = [
+                            'Open' => [],
+                            'Closed' => [],
+                        ];
+                        foreach (Account::all() as $account) {
+                            $options[$account->status == 'closed' ? 'Closed' : 'Open'][$account->id] = $account->name;
+                        }
+
+                        return $options;
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['value'],
+                            fn (Builder $query, $value): Builder => $query->where('account_id', $value),
+                        );
+                    }),
 
                 Tables\Filters\SelectFilter::make('category')
                     ->relationship('category', 'name'),
