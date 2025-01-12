@@ -166,7 +166,8 @@ class MovementResource extends Resource
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
             ->defaultPaginationPageOption(25)
             ->defaultSort('date', 'DESC')
-            ->persistFiltersInSession();
+            ->persistFiltersInSession()
+            ->persistSortInSession();
     }
 
     public static function getRelations(): array
