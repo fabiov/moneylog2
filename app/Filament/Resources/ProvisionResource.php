@@ -81,6 +81,25 @@ class ProvisionResource extends Resource
 
                         return $indicators;
                     }),
+                Tables\Filters\Filter::make('description')
+                    ->form([
+                        Forms\Components\TextInput::make('description'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['description'] ?? null,
+                                fn (Builder $query, $value): Builder => $query->where('description', 'LIKE', "%$value%"),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if (($data['description'] ?? '') !== '') {
+                            $indicators['description'] = 'Description: ' . $data['description'];
+                        }
+
+                        return $indicators;
+                    }),
             ], Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->defaultPaginationPageOption(25)
             ->defaultSort('date', 'desc')
