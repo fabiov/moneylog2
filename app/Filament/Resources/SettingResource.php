@@ -57,6 +57,9 @@ class SettingResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<Setting>
+     */
     public static function getEloquentQuery(): Builder
     {
         /** @var User $user */
