@@ -35,13 +35,7 @@ class MovementsStats extends BaseWidget
         $untilFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_until'));
         $endDate = empty($fromFilterValue) ? Carbon::now() : Carbon::parse($untilFilterValue);
 
-        if ($startDate->diffInYears($endDate) > 2) {
-            $interval = DateInterval::createFromDateString('1 year');
-        } elseif ($startDate->diffInMonths($endDate) > 2) {
-            $interval = DateInterval::createFromDateString('1 months');
-        } else {
-            $interval = DateInterval::createFromDateString('1 day');
-        }
+        $interval = DateInterval::createFromDateString($startDate->diffInYears($endDate) > 2 ? '1 year' : '1 months');
 
         $widgets = [];
         /** @var Account $account */
