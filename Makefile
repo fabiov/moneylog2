@@ -6,6 +6,7 @@ help:
 	@echo "${bold}Docker containers manipulation commands${reset}"
 	@echo "${green}up${reset}		Start containers in background mode"
 	@echo "${green}down${reset}		Stops containers and removes containers, networks, volumes, and images created by \`up\`"
+	@echo "${green}ps${reset}		Show containers process status"
 	@echo ""
 	@echo "${bold}Interactive terminals${reset}"
 	@echo "${green}sh${reset}		Web container console as www-data user"
@@ -26,6 +27,9 @@ up:
 down:
 	@echo "🏃 ${green}Stopping the application...${reset}"
 	@./vendor/bin/sail down
+
+ps:
+	docker compose ps
 
 # Interactive terminals ################################################################################################
 

@@ -14,6 +14,7 @@ use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Number;
 
 class MovementsStats extends BaseWidget
@@ -30,31 +31,37 @@ class MovementsStats extends BaseWidget
     protected function getStats(): array
     {
         $fromFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_from'));
-        $startDate = empty($fromFilterValue) ? Carbon::now()->subYear() : Carbon::parse($fromFilterValue);
+        $startDate = empty($fromFilterValue) ? self::getOldestMovement() : Carbon::parse($fromFilterValue);
 
         $untilFilterValue = Type::nullableString(Arr::get((array) $this->tableFilters, 'date.date_until'));
         $endDate = empty($fromFilterValue) ? Carbon::now() : Carbon::parse($untilFilterValue);
 
-        if ($startDate->diffInYears($endDate) > 2) {
-            $interval = DateInterval::createFromDateString('1 year');
-        } elseif ($startDate->diffInMonths($endDate) > 2) {
-            $interval = DateInterval::createFromDateString('1 months');
-        } else {
-            $interval = DateInterval::createFromDateString('1 day');
-        }
-
         $widgets = [];
         /** @var Account $account */
         foreach (Account::where('status', '<>', 'closed')->get() as $account) {
-            $balance = Type::float(Movement::where('account_id', $account->id)->sum('amount'));
+            $trend = Movement::where('account_id', $account->id)
+                    ->selectRaw('YEAR(date) AS year, SUM(amount) AS total_amount')
+                    ->where('date', '>=', $startDate)
+                    ->where('date', '<=', $endDate)
+                    ->groupBy('year')
+                    ->orderBy('year')
+                    ->pluck('total_amount', 'year')
+                    ->map('floatval')
+                    ->toArray();
 
-            $trend = Movement::getTrend($account->id, $startDate, $endDate, $interval);
-
-            $widgets[] = Stat::make($account->name, Number::currency($balance, 'EUR', 'it'))
-                ->chart(array_map(fn (float $value): int => (int) $value, $trend))
+            $widgets[] = Stat::make($account->name, Number::currency(array_sum($trend), 'EUR', 'it'))
+                ->chart($trend)
                 ->chartColor(reset($trend) > end($trend) ? 'danger' : 'success');
         }
 
         return $widgets;
+    }
+
+    private static function getOldestMovement(): Carbon
+    {
+        return Carbon::parse(Movement::join(
+            'accounts',
+            fn ($join) => $join->on('accounts.id', '=', 'movements.account_id')->where('accounts.user_id', Auth::id())
+        )->min('movements.date'));
     }
 }

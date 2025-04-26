@@ -55,17 +55,4 @@ class Movement extends Model
 
         return $model?->account_id;
     }
-
-    /**
-     * @return array<float>
-     */
-    public static function getTrend(int $accountId, Carbon $start, Carbon $stop, DateInterval $interval): array
-    {
-        $data = [];
-        for ($d = clone $start; $d < $stop; $d->add($interval)) {
-            $data[] = Type::float(Movement::where('account_id', $accountId)->where('date', '<', $d)->sum('amount'));
-        }
-
-        return $data;
-    }
 }
