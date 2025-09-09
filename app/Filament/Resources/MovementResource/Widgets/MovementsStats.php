@@ -38,6 +38,7 @@ class MovementsStats extends BaseWidget
         $widgets = [];
         /** @var Account $account */
         foreach (Account::where('status', '<>', 'closed')->get() as $account) {
+            /** @var array<int, float> $trend */
             $trend = Movement::where('account_id', $account->id)
                 ->selectRaw('YEAR(date) AS year, SUM(amount) AS total_amount')
                 ->where('date', '>=', $startDate)
@@ -45,7 +46,7 @@ class MovementsStats extends BaseWidget
                 ->groupBy('year')
                 ->orderBy('year')
                 ->pluck('total_amount', 'year')
-                ->map('floatval')
+                ->map(fn ($item): float => Type::float($item))
                 ->toArray();
 
             $widgets[] = Stat::make($account->name, Number::currency(array_sum($trend), 'EUR', 'it'))
@@ -58,9 +59,11 @@ class MovementsStats extends BaseWidget
 
     private static function getOldestMovement(): Carbon
     {
-        return Carbon::parse(Movement::join(
+        $qb = Movement::join(
             'accounts',
             fn ($join) => $join->on('accounts.id', '=', 'movements.account_id')->where('accounts.user_id', Auth::id())
-        )->min('movements.date'));
+        );
+
+        return Carbon::parse(Type::string($qb->min('movements.date')));
     }
 }
