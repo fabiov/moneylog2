@@ -9,7 +9,8 @@
         "filament/filament": "^3.2.132",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
-        "spatie/db-dumper": "^3.8"
+        "spatie/db-dumper": "^3.8",
+        "spatie/dropbox-api": "^1.23"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
