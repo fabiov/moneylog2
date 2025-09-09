@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Helpers\Type;
 use Carbon\Carbon;
-use DateInterval;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -54,18 +52,5 @@ class Movement extends Model
         $model = $qb->first();
 
         return $model?->account_id;
-    }
-
-    /**
-     * @return array<float>
-     */
-    public static function getTrend(int $accountId, Carbon $start, Carbon $stop, DateInterval $interval): array
-    {
-        $data = [];
-        for ($d = clone $start; $d < $stop; $d->add($interval)) {
-            $data[] = Type::float(Movement::where('account_id', $accountId)->where('date', '<', $d)->sum('amount'));
-        }
-
-        return $data;
     }
 }
