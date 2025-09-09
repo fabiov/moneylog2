@@ -123,4 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'dropbox_token' => env('DROPBOX_TOKEN'),
 ];
