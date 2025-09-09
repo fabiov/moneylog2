@@ -20,11 +20,11 @@ class AccountingBalancesChart extends ChartWidget
         $user = auth()->user();
 
         $data = DB::table('accounts')
-            ->select(['accounts.name', DB::raw('SUM(movements.amount) AS total')])
+            ->select(['accounts.id', 'accounts.name', DB::raw('SUM(movements.amount) AS total')])
             ->leftJoin('movements', 'accounts.id', '=', 'movements.account_id')
             ->where('accounts.user_id', $user->id)
             ->where('accounts.status', 'highlight')
-            ->groupBy('accounts.id')
+            ->groupBy('accounts.id', 'accounts.name')
             ->orderBy('total', 'DESC')
             ->get()
             ->toArray();
