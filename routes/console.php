@@ -12,4 +12,4 @@ Artisan::command('inspire', fn () => $this->comment(Inspiring::quote()))
     ->purpose('Display an inspiring quote')
     ->hourly();
 
-Schedule::command('emails:send Taylor --force')->daily();
+Schedule::command('app:db-dump')->daily();
