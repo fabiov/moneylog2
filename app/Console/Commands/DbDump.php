@@ -8,25 +8,30 @@ use App\Helpers\Type;
 use Illuminate\Console\Command;
 use Spatie\DbDumper\Compressors\GzipCompressor;
 use Spatie\DbDumper\Databases\MySql;
-use Spatie\DbDumper\Exceptions\CannotSetParameter;
-use Spatie\Dropbox\Client;
 
 class DbDump extends Command
 {
     /** @var string */
-    protected $signature = 'app:db-dump';
+    protected $signature = 'app:db-dump {directory}';
 
     /** @var string */
-    protected $description = 'Make a DB dump adn upload it on dropbox';
+    protected $description = 'Make a DB dump';
 
-    /**
-     * @throws CannotSetParameter
-     */
     public function handle(): int
     {
-        $filePath = tempnam(sys_get_temp_dir(), 'laravel_dump_');
+        $directory = Type::string($this->argument('directory'));
+
+        if (! is_dir($directory)) {
+            if (! mkdir($directory, 0755, true) && ! is_dir($directory)) {
+                $this->error("Directory could not be created: $directory");
+
+                return self::FAILURE;
+            }
+        }
+
+        $filePath = rtrim($directory, '/') . '/' . sprintf('moneylog2_%s.sql.gz', date('Y-m-d_H.i.s'));
         if ($this->verbosity) {
-            $this->info("Creating temporary file $filePath");
+            $this->info("Creating dump file $filePath");
         }
 
         MySql::create()
@@ -36,21 +41,6 @@ class DbDump extends Command
             ->setHost(Type::string(config('database.connections.mysql.host')))
             ->useCompressor(new GzipCompressor)
             ->dumpToFile($filePath);
-
-        $resource = fopen($filePath, 'r');
-        if (! $resource) {
-            $this->error('Unable to create dump file.');
-
-            return self::FAILURE;
-        }
-
-        $client = new Client(Type::string(config('app.dropbox_token')));
-        try {
-            $client->upload(sprintf('moneylog2_%s.sql.gz', date('Y-m-d_H')), $resource);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
-        unlink($filePath);
 
         return self::SUCCESS;
     }
