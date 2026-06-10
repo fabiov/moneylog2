@@ -16,7 +16,7 @@ class DbDump extends Command
     protected $signature = 'app:db-dump';
 
     /** @var string */
-    protected $description = 'Make a DB dump adn upload it on dropbox';
+    protected $description = 'Make a DB dump';
 
     /**
      * @throws CannotSetParameter
