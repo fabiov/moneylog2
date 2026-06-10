@@ -6,10 +6,9 @@ namespace App\Console\Commands;
 
 use App\Helpers\Type;
 use Illuminate\Console\Command;
-use Spatie\DbDumper\Compressors\GzipCompressor;
+use Spatie\DbDumper\Compressors\Bzip2Compressor;
 use Spatie\DbDumper\Databases\MySql;
 use Spatie\DbDumper\Exceptions\CannotSetParameter;
-use Spatie\Dropbox\Client;
 
 class DbDump extends Command
 {
@@ -17,40 +16,28 @@ class DbDump extends Command
     protected $signature = 'app:db-dump';
 
     /** @var string */
-    protected $description = 'Make a DB dump adn upload it on dropbox';
+    protected $description = 'Make a DB dump';
 
     /**
      * @throws CannotSetParameter
      */
     public function handle(): int
     {
-        $filePath = tempnam(sys_get_temp_dir(), 'laravel_dump_');
-        if ($this->verbosity) {
-            $this->info("Creating temporary file $filePath");
+        $dumpDir = storage_path('dumps');
+        if (! file_exists($dumpDir)) {
+            mkdir($dumpDir, 0755, true);
         }
+        $filePath = $dumpDir . '/' . 'moneylog2_' . date('Y-m-d.H.i') . '.sql.bz2';
 
         MySql::create()
             ->setDbName(Type::string(config('database.connections.mysql.database')))
             ->setUserName(Type::string(config('database.connections.mysql.username')))
             ->setPassword(Type::string(config('database.connections.mysql.password')))
             ->setHost(Type::string(config('database.connections.mysql.host')))
-            ->useCompressor(new GzipCompressor)
+            ->useCompressor(new Bzip2Compressor)
             ->dumpToFile($filePath);
 
-        $resource = fopen($filePath, 'r');
-        if (! $resource) {
-            $this->error('Unable to create dump file.');
-
-            return self::FAILURE;
-        }
-
-        $client = new Client(Type::string(config('app.dropbox_token')));
-        try {
-            $client->upload(sprintf('moneylog2_%s.sql.gz', date('Y-m-d_H')), $resource);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
-        unlink($filePath);
+        $this->info("Created file dump $filePath");
 
         return self::SUCCESS;
     }
